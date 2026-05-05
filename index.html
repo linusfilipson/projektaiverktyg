@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adobe Firefly — AI-Verktyg Projekt</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E8290B;
+    --dark: #0D0D0D;
+    --mid: #1A1A1A;
+    --card: #161616;
+    --border: #2A2A2A;
+    --text: #E8E4DC;
+    --muted: #888;
+    --accent: #FF6B35;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    position: relative;
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(232,41,11,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 20%, rgba(255,107,53,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 900px;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 0.35rem 1rem;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 16vw, 14rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero-title span {
+    display: block;
+    color: var(--red);
+    -webkit-text-stroke: 2px var(--red);
+    color: transparent;
+  }
+
+  .hero-sub {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: var(--muted);
+    margin-top: 2rem;
+    max-width: 500px;
+    margin-inline: auto;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-link {
+    display: inline-block;
+    margin-top: 2.5rem;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: border-color 0.2s, color 0.2s;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .hero-link:hover { color: var(--red); border-color: var(--red); }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: fadeUp 1s 0.8s ease both;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+    animation: scrollPulse 1.8s ease-in-out infinite;
+  }
+
+  /* SECTIONS */
+  section {
+    max-width: 1100px;
+    margin-inline: auto;
+    padding: 6rem 2rem;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    margin-bottom: 2rem;
+  }
+
+  p { color: #C8C4BC; margin-bottom: 1.2rem; }
+
+  /* DIVIDER */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 2rem;
+    max-width: calc(1100px - 4rem);
+    margin-inline: auto;
+  }
+
+  /* DESCRIPTION */
+  .desc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .desc-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .desc-card:hover { border-color: var(--red); }
+
+  .desc-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .desc-card:hover::before { transform: scaleX(1); }
+
+  .desc-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+
+  .desc-card p { font-size: 0.9rem; margin: 0; }
+
+  /* TESTS */
+  .tests-wrapper { margin-top: 3rem; display: flex; flex-direction: column; gap: 2px; }
+
+  .test-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .test-item:hover { border-color: rgba(232,41,11,0.4); }
+
+  .test-header {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    gap: 2rem;
+    cursor: pointer;
+  }
+
+  .test-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--border);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .test-item:hover .test-num { color: var(--red); }
+
+  .test-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.03em;
+  }
+
+  .test-arrow {
+    color: var(--muted);
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+  }
+
+  .test-body {
+    padding: 0 2rem 0 calc(80px + 2rem + 2rem);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+  }
+
+  .test-item.open .test-body {
+    max-height: 800px;
+    padding-bottom: 2rem;
+  }
+
+  .test-item.open .test-arrow { transform: rotate(90deg); }
+
+  .prompt-box {
+    background: var(--mid);
+    border-left: 3px solid var(--red);
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  .prompt-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .img-placeholder {
+    background: var(--mid);
+    border: 1px dashed var(--border);
+    border-radius: 2px;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 1rem 0;
+  }
+
+  /* ANALYSIS */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    margin-top: 3rem;
+    border: 1px solid var(--border);
+  }
+
+  .analysis-cell {
+    background: var(--card);
+    padding: 2rem 1.5rem;
+    transition: background 0.3s;
+  }
+
+  .analysis-cell:hover { background: #1E1E1E; }
+
+  .analysis-icon {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .analysis-cell h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+
+  .analysis-cell p { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+  /* RATING */
+  .rating-section {
+    margin-top: 4rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .rating-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 8rem;
+    line-height: 1;
+    color: var(--red);
+  }
+
+  .rating-number span {
+    font-size: 3rem;
+    color: var(--muted);
+  }
+
+  .stars { font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: 0.1em; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  footer a { color: var(--red); text-decoration: none; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 700px) {
+    .desc-grid { grid-template-columns: 1fr; }
+    .analysis-grid { grid-template-columns: 1fr; }
+    .rating-section { grid-template-columns: 1fr; gap: 1.5rem; }
+    .test-header { grid-template-columns: 50px 1fr auto; gap: 1rem; }
+    .test-body { padding-left: 1.5rem; }
+    .test-num { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Projekt AI-Verktyg · VT 2026</div>
+    <h1 class="hero-title">
+      Adobe
+      <span>Firefly</span>
+    </h1>
+    <p class="hero-sub">En undersökning av AI-driven bildgenerering — från enkel prompt till färdig matchdagsposter.</p>
+    <a href="https://firefly.adobe.com" target="_blank" class="hero-link">firefly.adobe.com ↗</a>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scrolla
+  </div>
+</div>
+
+<!-- DESCRIPTION -->
+<section class="reveal">
+  <div class="section-label">01 — Verktyget</div>
+  <h2>Vad är Adobe Firefly?</h2>
+  <p>Adobe Firefly är ett AI-verktyg för bildgenerering utvecklat av Adobe. Det låter användare skapa bilder direkt från textbeskrivningar — så kallade prompts — på naturligt språk. Verktyget är enkelt att använda och kräver inga avancerade förkunskaper, vilket gör det lätt att snabbt omvandla idéer till visuella bilder.</p>
+  <p>Syftet med att testa verktyget var att undersöka hur AI tolkar olika instruktioner och hur små förändringar i texten kan påverka resultatet. Genom att experimentera med olika formuleringar, stilar och detaljer kan man se hur bilden förändras och utvecklas.</p>
+
+  <div class="desc-grid">
+    <div class="desc-card">
+      <h3>Kostnad</h3>
+      <p>Gratis med 25 krediter per månad. Vill man ha fler måste man betala för en prenumeration. För det här projektet räckte gratisversionen gott och väl.</p>
+    </div>
+    <div class="desc-card">
+      <h3>Målgrupp</h3>
+      <p>Designers, marknadsförare, studenter och alla som vill omvandla text till bild snabbt. Passar bra för den som jobbar med kreativa projekt men inte kan rita.</p>
+    </div>
+    <div class="desc-card">
+      <h3>Kräver konto?</h3>
+      <p>Ja — ett gratis Adobe-konto räcker för att komma igång. Enkelt att registrera sig på firefly.adobe.com.</p>
+    </div>
+    <div class="desc-card">
+      <h3>Användningsområden</h3>
+      <p>Skapa affischer, bakgrundsbilder, konceptkonst, logotypidéer, grafik till sociala medier eller bara utforska kreativa idéer.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TESTS -->
+<section class="reveal">
+  <div class="section-label">02 — Use Case</div>
+  <h2>Fyra Tester</h2>
+  <p>Temat för alla tester var att skapa spelarposter och matchgrafik med fotbollstema — från enkel prompt till färdig matchdagsposter.</p>
+
+  <div class="tests-wrapper">
+
+    <div class="test-item" onclick="toggleTest(this)">
+      <div class="test-header">
+        <div class="test-num">01</div>
+        <div class="test-title">Enkel prompt</div>
+        <div class="test-arrow">▶</div>
+      </div>
+      <div class="test-body">
+        <div class="prompt-label">Prompt</div>
+        <div class="prompt-box">Football player poster</div>
+        <p>Resultatet blev en amerikansk fotbollsspelare — inte en fotbollsspelare i traditionell bemärkelse. AI:n tolkade "football" som amerikansk fotboll, vilket visar hur viktigt det är att vara tydlig i sina promptar. Bilden var ändå välgjord tekniskt sett.</p>
+        <div class="img-placeholder">📸 Klistra in skärmklipp här</div>
+      </div>
+    </div>
+
+    <div class="test-item" onclick="toggleTest(this)">
+      <div class="test-header">
+        <div class="test-num">02</div>
+        <div class="test-title">Detaljerad prompt</div>
+        <div class="test-arrow">▶</div>
+      </div>
+      <div class="test-body">
+        <div class="prompt-label">Prompt</div>
+        <div class="prompt-box">Soccer player poster, dramatic stadium lighting, red and white colors, action pose, photorealistic, dark background, motion blur</div>
+        <p>Med fler detaljer i prompten förändrades resultatet markant. Ljussättning, färger och stämning gick att styra genom texten. Det här testet visade tydligt hur mycket en välformulerad prompt påverkar slutresultatet jämfört med en kort och enkel.</p>
+        <div class="img-placeholder">📸 Klistra in skärmklipp här</div>
+      </div>
+    </div>
+
+    <div class="test-item" onclick="toggleTest(this)">
+      <div class="test-header">
+        <div class="test-num">03</div>
+        <div class="test-title">Stilbyte</div>
+        <div class="test-arrow">▶</div>
+      </div>
+      <div class="test-body">
+        <div class="prompt-label">Prompt</div>
+        <div class="prompt-box">Soccer player poster — fotorealistisk / grafisk / illustration / retro</div>
+        <p>Samma motiv testades i fyra olika stilar. Tyvärr verkade Firefly inte ha något minne av tidigare promptar — när jag bad den "bygga vidare" på föregående bild ignorerade den det och skapade något nytt. Det ledde t.ex. till en person på ett gym i stället för en fotbollsspelare. Lärdom: ange alltid hela kontexten i varje ny prompt.</p>
+        <div class="img-placeholder">📸 Klistra in skärmklipp här</div>
+      </div>
+    </div>
+
+    <div class="test-item" onclick="toggleTest(this)">
+      <div class="test-header">
+        <div class="test-num">04</div>
+        <div class="test-title">Matchdagsposter</div>
+        <div class="test-arrow">▶</div>
+      </div>
+      <div class="test-body">
+        <div class="prompt-label">Prompt</div>
+        <div class="prompt-box">Liverpool FC matchday poster, vintage red and gold color palette, retro photography style, dramatic stadium atmosphere, iconic players, bold typography</div>
+        <p>Det här var det bästa resultatet av alla fyra testerna. Med en tydlig och detaljerad prompt levererade Firefly en riktigt snygg bild — gamla men realistiska spelarstilar med matchdagskänsla. Det är ungefär det jag hade i åtanke från början. Tydlig prompt = bra resultat.</p>
+        <div class="img-placeholder">📸 Klistra in skärmklipp här</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ANALYSIS -->
+<section class="reveal">
+  <div class="section-label">03 — Analys</div>
+  <h2>Slutlig Utvärdering</h2>
+  <p>Adobe Firefly är ett kraftfullt verktyg när man vet hur man använder det. Den viktigaste lärdomen från projektet är att kvaliteten på resultatet är direkt kopplad till hur välformulerad prompten är.</p>
+
+  <div class="analysis-grid">
+    <div class="analysis-cell">
+      <div class="analysis-icon">✅</div>
+      <h4>Vad var bra</h4>
+      <p>Enkelt att komma igång. Producerar snygga bilder när prompten är tydlig. Gratis för grundläggande användning. Bra för att testa kreativa idéer snabbt.</p>
+    </div>
+    <div class="analysis-cell">
+      <div class="analysis-icon">⚠️</div>
+      <h4>Vad var dåligt</h4>
+      <p>Saknar minne mellan promptar — man kan inte säga "gör samma sak men ändra X". Missförstår ibland ord (football = amerikansk fotboll). Kräver väldigt specifika promptar.</p>
+    </div>
+    <div class="analysis-cell">
+      <div class="analysis-icon">🎯</div>
+      <h4>Nytta för mig</h4>
+      <p>Ja, verktyget är användbart om man behöver snabb grafik till ett projekt, en presentation eller sociala medier — och inte har tid att skapa det manuellt.</p>
+    </div>
+    <div class="analysis-cell">
+      <div class="analysis-icon">👥</div>
+      <h4>Målgrupp</h4>
+      <p>Designers, marknadsförare och innehållsskapare. Också bra för elever och studenter som behöver snabb grafik till skolprojekt.</p>
+    </div>
+    <div class="analysis-cell">
+      <div class="analysis-icon">💰</div>
+      <h4>Kostnad</h4>
+      <p>Gratisversionen räcker för tillfällig användning. Vill man använda det regelbundet behöver man betala — 25 krediter tar slut snabbt om man testar mycket.</p>
+    </div>
+    <div class="analysis-cell">
+      <div class="analysis-icon">💡</div>
+      <h4>Tips</h4>
+      <p>Skriv alltid på engelska. Var specifik med stil, ljussättning, färger och stämning. Repetera viktig kontext i varje ny prompt.</p>
+    </div>
+  </div>
+
+  <div class="rating-section">
+    <div>
+      <div class="rating-number">3.5<span>/5</span></div>
+      <div class="stars">★★★½☆</div>
+    </div>
+    <div>
+      <h3 style="font-family:'Bebas Neue',sans-serif; font-size:1.8rem; margin-bottom:1rem;">Sammanfattning</h3>
+      <p>Adobe Firefly är ett imponerande AI-verktyg som gör det möjligt att snabbt skapa visuellt tilltalande bilder från textbeskrivningar. Det är lätt att komma igång och gratisversionen räcker för att testa och lära sig grunderna. Den stora utmaningen är att verktyget kräver väldigt detaljerade och genomtänkta promptar för att ge riktigt bra resultat — korta och vaga beskrivningar ger ofta fel eller generiska bilder. Sammantaget är det ett nyttigt verktyg för kreativt arbete, men man behöver öva på att skriva bra promptar.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Projekt AI-Verktyg · VT 2026 · <a href="https://firefly.adobe.com" target="_blank">firefly.adobe.com</a></p>
+</footer>
+
+<script>
+  // Accordion
+  function toggleTest(el) {
+    el.classList.toggle('open');
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
